@@ -1,0 +1,53 @@
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# Python specific files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific files
+*.sqlite3
+db.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore settings files
+settings_local.py
+
+# Django migrations
+*/migrations/*
+
+# Static and media files
+staticfiles/
+media/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS specific files
+.DS_Store
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+
+# Backup files
+*.bak
+
+# Other IDEs and editors
+*.swp
+*~
+.project
+.idea/
+__pycache__/
