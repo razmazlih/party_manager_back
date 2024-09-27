@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email')
     list_filter = ('role',)
 
-# רישום מודל המסיבה
+# רישום מודל האירוע
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'location', 'date', 'price', 'status', 'available_places', 'organizer')
@@ -18,9 +18,9 @@ class EventAdmin(admin.ModelAdmin):
 # רישום מודל ההזמנה
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'event', 'reservation_date', 'seats_reserved')
+    list_display = ('user', 'event', 'reservation_date', 'seats_reserved', 'status')  # עודכן
     search_fields = ('user__username', 'event__name')
-    list_filter = ('reservation_date',)
+    list_filter = ('reservation_date', 'status')  # עודכן
 
 # רישום מודל התגובה
 @admin.register(Comment)

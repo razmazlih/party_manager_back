@@ -28,6 +28,11 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        if instance.status == 'approved':
+            raise serializers.ValidationError("Cannot modify an approved reservation.")
+        return super().update(instance, validated_data)
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
