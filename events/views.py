@@ -23,10 +23,12 @@ class EventViewSet(viewsets.ModelViewSet):
         return Event.objects.filter(status=True)
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['status', 'event__name']
+
+    def get_queryset(self):
+        return Reservation.objects.filter(user=self.request.user)
 
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):

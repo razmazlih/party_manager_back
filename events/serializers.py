@@ -24,9 +24,12 @@ class EventSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReservationSerializer(serializers.ModelSerializer):
+    event_name = serializers.ReadOnlyField(source='event.name')  # שם האירוע
+    event_date = serializers.ReadOnlyField(source='event.date')  # תאריך האירוע
+
     class Meta:
         model = Reservation
-        fields = '__all__'
+        fields = '__all__'  # מחזיר את כל השדות הקיימים
 
     def update(self, instance, validated_data):
         if instance.status == 'approved':
