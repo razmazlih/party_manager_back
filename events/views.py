@@ -9,6 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .models import Event, Reservation, Comment, Notification
 from .serializers import EventSerializer, ReservationSerializer, CommentSerializer, NotificationSerializer, UserSerializer
+from events import serializers
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -36,11 +37,31 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # מחזיר את ההזמנות של המשתמש המחובר
         return Reservation.objects.filter(user=self.request.user)
 
+    def perform_create(self, serializer):
+        event = serializer.validated_data['event']
+        seats_reserved = serializer.validated_data.get('seats_reserved', 1)
+
+        # בדיקה אם יש מספיק מקומות פנויים
+        if event.available_places < seats_reserved:
+            raise serializers.ValidationError("Not enough available places for this reservation.")
+
+        # הפחתת מספר המושבים הפנויים באירוע
+        event.available_places -= seats_reserved
+        event.save()
+
+        serializer.save(user=self.request.user)
+
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         reservation = self.get_object()
         if reservation.status == 'approved':
             return Response({'detail': 'Cannot cancel an approved reservation.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # החזרת מספר המקומות הפנויים באירוע במקרה של ביטול
+        event = reservation.event
+        event.available_places += reservation.seats_reserved
+        event.save()
+
         reservation.status = 'cancelled'
         reservation.save()
         return Response({'detail': 'Reservation cancelled successfully.'})
