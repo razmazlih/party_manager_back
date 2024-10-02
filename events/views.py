@@ -4,6 +4,7 @@ from .serializers import EventSerializer, ReservationSerializer, CommentSerializ
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .models import Event, Reservation, Comment, Notification
@@ -28,6 +29,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'event__name']
 
     def get_queryset(self):
+        # בדיקה אם המשתמש מחובר
+        if self.request.user.is_anonymous:
+            raise NotAuthenticated("User must be authenticated to view reservations.")
+
+        # מחזיר את ההזמנות של המשתמש המחובר
         return Reservation.objects.filter(user=self.request.user)
 
     @action(detail=True, methods=['post'])
