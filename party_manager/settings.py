@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import timedelta
 
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -96,4 +97,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # זמן החיים של ה-Access Token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # זמן החיים של ה-Refresh Token
+    'ROTATE_REFRESH_TOKENS': True,  # אפשרות לחידוש הטוקן עם כל בקשה
+    'BLACKLIST_AFTER_ROTATION': True,  # סימון טוקן לאחר רענון
 }
