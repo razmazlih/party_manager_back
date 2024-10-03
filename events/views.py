@@ -35,7 +35,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             raise NotAuthenticated("User must be authenticated to view reservations.")
 
         # מחזיר את ההזמנות של המשתמש המחובר
-        return Reservation.objects.filter(user=self.request.user)
+        return Reservation.objects.filter(user=self.request.user).order_by('-created_at')  # מיון מההזמנות החדשות לישנות
 
     def perform_create(self, serializer):
         event = serializer.validated_data['event']
@@ -49,6 +49,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         event.available_places -= seats_reserved
         event.save()
 
+        # שמירת ההזמנה
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['post'])
@@ -62,6 +63,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         event.available_places += reservation.seats_reserved
         event.save()
 
+        # עדכון הסטטוס של ההזמנה ל-"cancelled"
         reservation.status = 'cancelled'
         reservation.save()
         return Response({'detail': 'Reservation cancelled successfully.'})
