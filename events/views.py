@@ -57,7 +57,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation = self.get_object()
         if reservation.status == 'approved':
             return Response({'detail': 'Cannot cancel an approved reservation.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # החזרת מספר המקומות הפנויים באירוע במקרה של ביטול
         event = reservation.event
         event.available_places += reservation.seats_reserved
@@ -71,6 +71,19 @@ class ReservationViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['event']
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        event = serializer.validated_data['event']
+        
+        # בדיקה אם למשתמש יש כבר תגובה עבור האירוע הזה
+        if Comment.objects.filter(event=event, user=user).exists():
+            raise serializers.ValidationError("You have already added a comment for this event.")
+        
+        # יצירת תגובה חדשה אם אין תגובה קיימת
+        serializer.save(user=user)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
