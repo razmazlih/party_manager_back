@@ -37,9 +37,11 @@ class ReservationSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')  # הוספת שם המשתמש לתגובות
+
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'event', 'content', 'user', 'username']  # הוספת 'username' לשדות
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
