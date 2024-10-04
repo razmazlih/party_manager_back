@@ -21,7 +21,6 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # שמירת האירוע עם המשתמש המחובר כמארגן
         serializer.save(organizer=self.request.user)
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
@@ -31,6 +30,15 @@ class EventViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
         events = Event.objects.filter(organizer=user)
         serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def pending_reservations(self, request, pk=None):
+        event = self.get_object()
+        if event.organizer != request.user:
+            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+        reservations = Reservation.objects.filter(event=event, status='pending')
+        serializer = ReservationSerializer(reservations, many=True)
         return Response(serializer.data)
 
     def get_queryset(self):
@@ -79,6 +87,24 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.status = 'cancelled'
         reservation.save()
         return Response({'detail': 'Reservation cancelled successfully.'})
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def approve(self, request, pk=None):
+        reservation = self.get_object()
+        if reservation.event.organizer != request.user:
+            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+        reservation.status = 'approved'
+        reservation.save()
+        return Response({'status': 'Reservation approved'})
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def reject(self, request, pk=None):
+        reservation = self.get_object()
+        if reservation.event.organizer != request.user:
+            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+        reservation.status = 'rejected'
+        reservation.save()
+        return Response({'status': 'Reservation rejected'})
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()

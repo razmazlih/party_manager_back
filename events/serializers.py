@@ -19,20 +19,20 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class EventSerializer(serializers.ModelSerializer):
-    organizer = serializers.ReadOnlyField(source='organizer.username')  # הגדרת השדה כקריאה בלבד
+    organizer = serializers.ReadOnlyField(source='organizer.username')
 
     class Meta:
         model = Event
         fields = ['id', 'name', 'description', 'location', 'date', 'price', 'available_places', 'organizer']
 
 class ReservationSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.username')
     event_name = serializers.ReadOnlyField(source='event.name')  # שם האירוע
     event_date = serializers.ReadOnlyField(source='event.date')  # תאריך האירוע
 
     class Meta:
         model = Reservation
-        fields = '__all__'  # מחזיר את כל השדות הקיימים
-
+        fields = ['id', 'event', 'reservation_date', 'event_name', 'user', 'user_name', 'status', 'seats_reserved', 'event_date']        
     def update(self, instance, validated_data):
         if instance.status == 'approved':
             raise serializers.ValidationError("Cannot modify an approved reservation.")

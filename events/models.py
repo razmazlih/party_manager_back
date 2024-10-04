@@ -26,6 +26,7 @@ class Reservation(models.Model):
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('cancelled', 'Cancelled'),
+        ('rejected', 'Rejected'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
