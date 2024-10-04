@@ -18,9 +18,20 @@ class RegisterView(generics.CreateAPIView):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['location', 'date', 'status']  # Filtering by these fields
-    search_fields = ['name', 'description']  # Searching in these fields
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # שמירת האירוע עם המשתמש המחובר כמארגן
+        serializer.save(organizer=self.request.user)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def organizer(self, request):
+        user = request.user
+        if user.role != 'organizer':
+            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+        events = Event.objects.filter(organizer=user)
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         return Event.objects.filter(status=True)

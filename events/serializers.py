@@ -19,9 +19,11 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class EventSerializer(serializers.ModelSerializer):
+    organizer = serializers.ReadOnlyField(source='organizer.username')  # הגדרת השדה כקריאה בלבד
+
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'location', 'date', 'price', 'available_places', 'organizer']
 
 class ReservationSerializer(serializers.ModelSerializer):
     event_name = serializers.ReadOnlyField(source='event.name')  # שם האירוע
