@@ -3,7 +3,7 @@ from .models import Event, Reservation, Comment, Notification
 from .serializers import EventSerializer, ReservationSerializer, CommentSerializer, NotificationSerializer, UserSerializer
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
@@ -94,3 +94,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # מחזיר רק את ההודעות של המשתמש המחובר
         user = self.request.user
         return Notification.objects.filter(user=user)
+    
+@api_view(['GET'])
+def get_user_role(request):
+    user = request.user
+    return Response({'role': user.role})
