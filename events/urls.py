@@ -8,7 +8,7 @@ router = DefaultRouter()
 router.register(r'events', EventViewSet)
 router.register(r'reservations', ReservationViewSet, basename='reservation')
 router.register(r'comments', CommentViewSet)
-router.register(r'notifications', NotificationViewSet)
+router.register(r'notifications', NotificationViewSet, basename='notification')
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),

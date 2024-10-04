@@ -5,6 +5,7 @@ from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .models import Event, Reservation, Comment, Notification
@@ -86,5 +87,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(user=user)
 
 class NotificationViewSet(viewsets.ModelViewSet):
-    queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]  # ודא שרק משתמשים מחוברים יכולים לראות את ההודעות
+
+    def get_queryset(self):
+        # מחזיר רק את ההודעות של המשתמש המחובר
+        user = self.request.user
+        return Notification.objects.filter(user=user)
