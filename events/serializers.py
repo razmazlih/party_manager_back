@@ -40,7 +40,20 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = ['id', 'event', 'reservation_date', 'event_name', 'user', 'user_name', 'status', 'seats_reserved', 'event_date']        
+        fields = ['id', 'event', 'reservation_date', 'event_name', 'user', 'user_name', 'status', 'seats_reserved', 'event_date']
+
+    def validate(self, data):
+        # בדיקה אם יש מקומות זמינים באירוע
+        event = data['event']
+        if event.available_places <= 0:
+            raise serializers.ValidationError("Cannot create a reservation for an event with no available places.")
+        
+        # בדיקה נוספת שההזמנה לא מבקשת יותר מקומות ממה שיש
+        if data['seats_reserved'] > event.available_places:
+            raise serializers.ValidationError("Not enough available places for this reservation.")
+        
+        return data
+
     def update(self, instance, validated_data):
         if instance.status == 'approved':
             raise serializers.ValidationError("Cannot modify an approved reservation.")
