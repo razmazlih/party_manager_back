@@ -9,6 +9,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'email', 'is_organizer')
         extra_kwargs = {'password': {'write_only': True}}
 
+    def validate_username(self, value):
+        value = value.lower()
+        
+        if User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError("שם המשתמש כבר קיים במערכת.")
+        return value
+
     def create(self, validated_data):
         validated_data['username'] = validated_data['username'].lower()
         
