@@ -46,6 +46,8 @@ class EventViewSet(viewsets.ModelViewSet):
         return Event.objects.filter(status=True)
 
 class EventNameDateListView(APIView):
+    permission_classes = [AllowAny]
+    
     def get(self, request):
         events = Event.objects.all()  # שולפים את כל האירועים
         serializer = EventNameDateSerializer(events, many=True)  # מסדרים אותם עם הסדרה המוקטנת
