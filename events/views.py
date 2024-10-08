@@ -2,6 +2,7 @@ from rest_framework import viewsets, generics
 from .models import Event, Reservation, Comment, Notification
 from .serializers import EventSerializer, ReservationSerializer, CommentSerializer, NotificationSerializer, UserSerializer
 from rest_framework import viewsets, generics, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import NotAuthenticated
@@ -9,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from .models import Event, Reservation, Comment, Notification
-from .serializers import EventSerializer, ReservationSerializer, CommentSerializer, NotificationSerializer, UserSerializer
+from .serializers import EventSerializer, ReservationSerializer, CommentSerializer, NotificationSerializer, UserSerializer, EventNameDateSerializer
 from events import serializers
 
 class RegisterView(generics.CreateAPIView):
@@ -43,6 +44,12 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Event.objects.filter(status=True)
+
+class EventNameDateListView(APIView):
+    def get(self, request):
+        events = Event.objects.all()  # שולפים את כל האירועים
+        serializer = EventNameDateSerializer(events, many=True)  # מסדרים אותם עם הסדרה המוקטנת
+        return Response(serializer.data)
 
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
