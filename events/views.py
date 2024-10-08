@@ -26,7 +26,7 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def organizer(self, request):
         user = request.user
-        if user.role != 'organizer':
+        if not user.is_organizer:
             return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
         events = Event.objects.filter(organizer=user)
         serializer = self.get_serializer(events, many=True)
@@ -50,12 +50,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'event__name']
 
     def get_queryset(self):
-        # בדיקה אם המשתמש מחובר
         if self.request.user.is_anonymous:
             raise NotAuthenticated("User must be authenticated to view reservations.")
-
-        # מחזיר את ההזמנות של המשתמש המחובר
-        return Reservation.objects.filter(user=self.request.user).order_by('-created_at')  # מיון מההזמנות החדשות לישנות
+        
+        # אם המשתמש הוא מארגן, אפשר לו לראות את כל ההזמנות לאירועים שהוא יצר
+        if self.request.user.is_organizer:
+            return Reservation.objects.filter(event__organizer=self.request.user).order_by('-created_at')
+        
+        # אחרת, המשתמש רואה רק את ההזמנות שלו
+        return Reservation.objects.filter(user=self.request.user).order_by('-created_at')
 
     def perform_create(self, serializer):
         event = serializer.validated_data['event']
@@ -91,17 +94,23 @@ class ReservationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def approve(self, request, pk=None):
         reservation = self.get_object()
+
         if reservation.event.organizer != request.user:
             return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+        
         reservation.status = 'approved'
         reservation.save()
         return Response({'status': 'Reservation approved'})
-    
+
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def reject(self, request, pk=None):
         reservation = self.get_object()
+        
+        # בדוק אם המשתמש המחובר הוא המארגן של האירוע
         if reservation.event.organizer != request.user:
-            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'detail': 'Not authorized. Only the organizer can reject reservations.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # דחיית ההזמנה
         reservation.status = 'rejected'
         reservation.save()
         return Response({'status': 'Reservation rejected'})
@@ -133,6 +142,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Notification.objects.filter(user=user)
     
 @api_view(['GET'])
-def get_user_role(request):
+def user_is_organizer(request):
     user = request.user
-    return Response({'role': user.role})
+    return Response({'is_organizer': user.is_organizer})

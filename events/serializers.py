@@ -2,17 +2,17 @@ from rest_framework import serializers
 from .models import User, Event, Reservation, Comment, Notification
 
 class UserSerializer(serializers.ModelSerializer):
+    is_organizer = serializers.BooleanField(source='profile.is_organizer', required=False, default=False)  # הגדרת ברירת מחדל ו-לא חובה
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'email', 'role', 'company_name')
+        fields = ('id', 'username', 'password', 'email', 'is_organizer')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User(
             email=validated_data['email'],
             username=validated_data['username'],
-            role=validated_data.get('role', 'regular'),
-            company_name=validated_data.get('company_name', '')
+            is_organizer=validated_data.get('is_organizer', False)
         )
         user.set_password(validated_data['password'])
         user.save()

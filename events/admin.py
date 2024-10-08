@@ -4,9 +4,9 @@ from .models import User, Event, Reservation, Comment, Notification
 # רישום מודל המשתמש
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'role', 'company_name')
+    list_display = ('username', 'email', 'is_organizer')
     search_fields = ('username', 'email')
-    list_filter = ('role',)
+    list_filter = ('is_organizer',)
 
 # רישום מודל האירוע
 @admin.register(Event)

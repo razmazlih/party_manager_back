@@ -6,8 +6,7 @@ class User(AbstractUser):
         ('organizer', 'Organizer'),
         ('regular', 'Regular User'),
     ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    company_name = models.CharField(max_length=100, blank=True, null=True)
+    is_organizer = models.BooleanField(default=False)
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
