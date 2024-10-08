@@ -1,1 +1,0 @@
-web: gunicorn party_manager.wsgi:application --log-file -
