@@ -122,7 +122,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # דחיית ההזמנה
         reservation.status = 'rejected'
         reservation.save()
-        return Response({'status': 'Reservation rejected'})
+        
+        event = reservation.event
+        event.available_places += reservation.seats_reserved
+        event.save()
+
+        return Response({'status': 'Reservation rejected and available places updated'})
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
