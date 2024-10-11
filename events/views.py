@@ -82,7 +82,14 @@ class ReservationViewSet(viewsets.ModelViewSet):
         event.save()
 
         # שמירת ההזמנה
-        serializer.save(user=self.request.user)
+        reservation = serializer.save(user=self.request.user)
+
+        # יצירת התראה עבור המשתמש
+        Notification.objects.create(
+        user=self.request.user,
+        title="Reservation Pending Approval",
+        content=f"Your ticket reservation for the event {event.name} is awaiting the organizer's approval."
+        )
 
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
@@ -98,6 +105,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # עדכון הסטטוס של ההזמנה ל-"cancelled"
         reservation.status = 'cancelled'
         reservation.save()
+
+        Notification.objects.create(
+        user=self.request.user,
+        title="Reservation Canceled",
+        content=f"Your ticket reservation for the event {event.name} is canceled."
+        )
+
         return Response({'detail': 'Reservation cancelled successfully.'})
     
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
@@ -109,6 +123,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
         
         reservation.status = 'approved'
         reservation.save()
+
+        Notification.objects.create(
+        user=self.request.user,
+        title="Reservation Approved",
+        content=f"Your ticket reservation for the event {reservation.event.name} is approved, see you there."
+        )
+
         return Response({'status': 'Reservation approved'})
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
@@ -126,6 +147,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
         event = reservation.event
         event.available_places += reservation.seats_reserved
         event.save()
+
+        Notification.objects.create(
+        user=reservation.user,
+        title="Reservation Rejected",
+        content=f"Your ticket reservation for the event {event.name} has been rejected."
+        )
 
         return Response({'status': 'Reservation rejected and available places updated'})
 
