@@ -44,10 +44,23 @@ class ReservationSerializer(serializers.ModelSerializer):
     user_name = serializers.ReadOnlyField(source='user.username')
     event_name = serializers.ReadOnlyField(source='event.name')  # שם האירוע
     event_date = serializers.ReadOnlyField(source='event.date')  # תאריך האירוע
+    verification_code = serializers.ReadOnlyField()  # קוד ייחודי לקריאה בלבד
+    is_verified = serializers.ReadOnlyField()  # מצב אימות הקוד
 
     class Meta:
         model = Reservation
-        fields = ['id', 'event', 'reservation_date', 'event_name', 'user', 'user_name', 'status', 'seats_reserved', 'event_date']
+        fields = [
+            'id', 'event', 'reservation_date', 'event_name', 'user', 
+            'user_name', 'status', 'seats_reserved', 'event_date', 
+            'verification_code', 'is_verified'
+        ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if not hasattr(self.instance, 'verification_code') or not self.instance.verification_code:
+            fields.pop('verification_code', None)
+            fields.pop('is_verified', None)
+        return fields
 
     def validate(self, data):
         # בדיקה אם יש מקומות זמינים באירוע
