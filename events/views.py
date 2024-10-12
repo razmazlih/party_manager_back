@@ -91,6 +91,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
         content=f"Your ticket reservation for the event {event.name} is awaiting the organizer's approval."
         )
 
+        return Response({'id': reservation.id, 'message': 'Reservation created successfully'}, status=status.HTTP_201_CREATED)
+
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         reservation = self.get_object()
