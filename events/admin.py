@@ -4,7 +4,7 @@ from .models import User, Event, Reservation, Comment, Notification
 # רישום מודל המשתמש
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'is_organizer')
+    list_display = ('username', 'is_organizer')
     search_fields = ('username', 'email')
     list_filter = ('is_organizer',)
 
