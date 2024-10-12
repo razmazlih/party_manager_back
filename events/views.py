@@ -157,6 +157,30 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'status': 'Reservation rejected and available places updated'})
+    
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def verify_event_code(self, request, pk=None):
+        event_id = pk
+        verification_code = request.data.get('verification_code')
+        
+        reservations = Reservation.objects.filter(event_id=event_id)
+
+        for reservation in reservations:
+            if reservation.verification_code == verification_code:
+                if reservation.is_verified:
+                    return Response({
+                        'status': 'Already scanned',
+                        'user_name': reservation.user.username
+                    }, status=status.HTTP_200_OK)
+                else:
+                    reservation.is_verified = True
+                    reservation.save()
+                    return Response({
+                        'status': 'Verification successful',
+                        'user_name': reservation.user.username
+                    }, status=status.HTTP_200_OK)
+        
+        return Response({'status': 'Invalid verification code'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
