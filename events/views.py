@@ -49,8 +49,8 @@ class EventNameDateListView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
-        events = Event.objects.all()  # שולפים את כל האירועים
-        serializer = EventNameDateSerializer(events, many=True)  # מסדרים אותם עם הסדרה המוקטנת
+        events = Event.objects.all()
+        serializer = EventNameDateSerializer(events, many=True)
         return Response(serializer.data)
 
 class ReservationViewSet(viewsets.ModelViewSet):
