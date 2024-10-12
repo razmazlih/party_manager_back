@@ -86,9 +86,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         # יצירת התראה עבור המשתמש
         Notification.objects.create(
-        user=self.request.user,
-        title="Reservation Pending Approval",
-        content=f"Your ticket reservation for the event {event.name} is awaiting the organizer's approval."
+            user=self.request.user,
+            title="Reservation Pending Approval",
+            content=f"Your ticket reservation for the event {event.name} is awaiting the organizer's approval."
         )
 
         return Response({'id': reservation.id, 'message': 'Reservation created successfully'}, status=status.HTTP_201_CREATED)
@@ -109,9 +109,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.save()
 
         Notification.objects.create(
-        user=self.request.user,
-        title="Reservation Canceled",
-        content=f"Your ticket reservation for the event {event.name} is canceled."
+            user=self.request.user,
+            title="Reservation Canceled",
+            content=f"Your ticket reservation for the event {event.name} is canceled."
         )
 
         return Response({'detail': 'Reservation cancelled successfully.'})
@@ -127,9 +127,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.save()
 
         Notification.objects.create(
-        user=self.request.user,
-        title="Reservation Approved",
-        content=f"Your ticket reservation for the event {reservation.event.name} is approved, see you there."
+            user=reservation.user,
+            title="Reservation Approved",
+            content=f"Your ticket reservation for the event {reservation.event.name} is approved. See you there!"
         )
 
         return Response({'status': 'Reservation approved'})
@@ -151,9 +151,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
         event.save()
 
         Notification.objects.create(
-        user=reservation.user,
-        title="Reservation Rejected",
-        content=f"Your ticket reservation for the event {event.name} has been rejected."
+            user=reservation.user,
+            title="Reservation Rejected",
+            content=f"Your ticket reservation for the event {event.name} has been rejected."
         )
 
         return Response({'status': 'Reservation rejected and available places updated'})
