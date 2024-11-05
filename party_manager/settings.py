@@ -104,6 +104,4 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),  # זמן החיים של ה-Access Token
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # זמן החיים של ה-Refresh Token
-    'ROTATE_REFRESH_TOKENS': True,  # אפשרות לחידוש הטוקן עם כל בקשה
-    'BLACKLIST_AFTER_ROTATION': True,  # סימון טוקן לאחר רענון
 }
