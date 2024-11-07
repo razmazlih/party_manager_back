@@ -1,11 +1,9 @@
 from pathlib import Path
 from datetime import timedelta
-import os
 from decouple import config
 import dj_database_url
 
 
-# Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
@@ -61,7 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'party_manager.wsgi.application'
 
-# Database
 DATABASES = {
     'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
@@ -102,6 +99,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),  # זמן החיים של ה-Access Token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # זמן החיים של ה-Refresh Token
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
