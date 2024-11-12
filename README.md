@@ -30,6 +30,33 @@ This project is a backend API for managing party-related events, built using Dja
 
 4. Set up environment variables as per `settings.py` requirements.
 
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your `.env` file:
+
+- **Database Configuration**:
+  - `DATABASE_URL` - The URL for the database connection, including credentials and host information.
+
+- **Django Settings**:
+  - `SECRET_KEY` - A unique key for securing Django (keep this value safe and do not share it).
+  - `DEBUG` - Set to `True` for development, `False` for production.
+  - `ALLOWED_HOSTS` - A comma-separated list of allowed hosts (e.g., `127.0.0.1,localhost`).
+
+- **CORS Settings**:
+  - `CORS_ALLOWED_ORIGINS` - A comma-separated list of origins allowed to make CORS requests (e.g., `http://localhost:3000`).
+
+Your `.env` file should look like this:
+
+```plaintext
+DATABASE_URL=postgres://your_db_user:your_db_password@your_db_host:your_db_port/your_db_name
+
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
 ## Usage
 
 To start the server:
