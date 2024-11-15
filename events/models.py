@@ -32,8 +32,8 @@ class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey('Event', on_delete=models.CASCADE, related_name='reservations')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    reservation_date = models.DateTimeField(auto_now_add=True)  # אם זהו התאריך הרצוי
-    seats_reserved = models.PositiveIntegerField(default=1)  # אם זהו מספר המושבים הרצוי
+    reservation_date = models.DateTimeField(auto_now_add=True)
+    seats_reserved = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     verification_code = models.CharField(max_length=100, unique=True, blank=True, null=True)
